@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a4fb0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PostOp">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>PostOp Rounds</title>
+<style>
+:root{--bg:#f2f5f6;--card:#fff;--ink:#16252d;--mute:#5b6b74;--line:#d6dde1;--acc:#1d5b79;--acc-soft:#e3eef4;--red:#b42318;--red-soft:#fdecea;--amb:#8a5a00;--amb-soft:#fff4d6;--grn:#256b45;--grn-soft:#e4f3ea}
+@media (prefers-color-scheme:dark){:root{--bg:#10191e;--card:#182329;--ink:#e6eef2;--mute:#9fb0b9;--line:#2b3a42;--acc:#4a9cc4;--acc-soft:#1b3340;--red:#ff8a80;--red-soft:#3a1d1a;--amb:#f0c060;--amb-soft:#3a2e10;--grn:#7ed4a0;--grn-soft:#15301f}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+button,input,select,textarea{font:inherit;color:inherit}
+header.top{position:sticky;top:0;z-index:5;background:var(--acc);color:#fff;display:flex;align-items:center;gap:6px;padding:calc(8px + env(safe-area-inset-top)) 10px 8px}
+header.top h1{margin:0;font-size:18px;font-weight:650;flex:1}
+#back{background:none;border:0;color:#fff;font-size:26px;line-height:1;padding:4px 10px;min-height:44px}
+main{max-width:720px;margin:0 auto;padding:12px}
+h2{font-size:17px;margin:18px 0 8px}
+h3{font-size:15px;margin:18px 0 8px;color:var(--mute);font-weight:650}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+.sub{color:var(--mute);font-size:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.btn{min-height:46px;padding:0 16px;border-radius:8px;border:1px solid var(--acc);background:var(--acc);color:#fff;font-weight:600;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--acc)}
+.btn.danger{background:transparent;color:var(--red);border-color:var(--red)}
+.btn.grow{flex:1}
+.lnk{background:none;border:0;color:var(--acc);text-decoration:underline;padding:0;font-weight:600}
+input[type=text],input[type=number],input[type=date],input[type=time],input[type=search],select,textarea{width:100%;min-height:46px;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--card);font-size:16px}
+textarea{min-height:90px;resize:vertical}
+label.f{display:block;margin-bottom:12px;font-weight:600;font-size:14px}
+label.f>input,label.f>select,label.f>textarea{margin-top:4px;font-weight:400}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid2.g4{grid-template-columns:1fr 1fr}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.segs{display:flex;gap:6px;margin:10px 0}
+.seg{flex:1;min-height:40px;border:1px solid var(--line);background:var(--card);border-radius:8px;font-weight:600}
+.seg.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0}
+.chip span{display:inline-block;padding:9px 13px;border:1px solid var(--line);border-radius:20px;background:var(--card)}
+.chip input:checked+span{background:var(--acc);color:#fff;border-color:var(--acc)}
+.chip input:focus-visible+span{outline:2px solid var(--acc);outline-offset:2px}
+.fl{font-weight:600;font-size:14px;margin:0 0 5px}
+.chip.bad input:checked+span{background:var(--red);border-color:var(--red);color:var(--card)}
+fieldset.mcq{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:8px 10px 4px;margin:0 0 12px;min-inline-size:0}
+fieldset.mcq legend{font-weight:700;padding:0 6px;font-size:16px}
+.opt{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;position:relative;cursor:pointer;min-height:48px}
+.opt input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.opt b{flex:none;width:30px;height:30px;border-radius:50%;background:var(--acc-soft);color:var(--acc);display:grid;place-items:center;font-size:14px}
+.opt:has(input:checked){background:var(--acc-soft);border-color:var(--acc)}
+.opt:has(input:checked) b{background:var(--acc);color:#fff}
+.opt.bad:has(input:checked){background:var(--red-soft);border-color:var(--red)}
+.opt.bad:has(input:checked) b{background:var(--red);color:var(--card)}
+.opt:has(input:focus-visible){outline:2px solid var(--acc);outline-offset:2px}
+.prog{font-weight:700;color:var(--acc);margin:0 0 10px}
+.tick{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card);margin-bottom:6px}
+.tick input{width:22px;height:22px;flex:none;margin:0;accent-color:var(--acc)}
+.tick.red input{accent-color:var(--red)}
+.tick:has(input:checked){background:var(--acc-soft);border-color:var(--acc)}
+.tick.red:has(input:checked){background:var(--red-soft);border-color:var(--red)}
+.pcard,.vcard,.ev,.lrow{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer}
+.pcard{display:flex;gap:12px;align-items:center}
+.pod{flex:none;width:56px;text-align:center;border-radius:8px;background:var(--acc-soft);color:var(--acc);padding:6px 0}
+.pod small{display:block;font-size:11px;font-weight:700;letter-spacing:.04em}
+.pod b{display:block;font-size:26px;line-height:1.05}
+.pod.done{background:var(--line);color:var(--mute)}
+.pod.big{width:72px}.pod.big b{font-size:34px}
+.pname{font-weight:700;font-size:17px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.tag{font-size:12px;font-weight:650;padding:2px 8px;border-radius:10px;background:var(--acc-soft);color:var(--acc)}
+.tag.red{background:var(--red-soft);color:var(--red)}
+.tag.amb{background:var(--amb-soft);color:var(--amb)}
+.tag.grn{background:var(--grn-soft);color:var(--grn)}
+.note{padding:10px 12px;border-radius:8px;margin-bottom:10px;font-size:14px}
+.note.amb{background:var(--amb-soft);color:var(--amb)}
+.flagtxt{color:var(--red);font-weight:600;font-size:14px;margin-top:4px}
+.vh{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+.fab{position:fixed;right:14px;bottom:calc(76px + env(safe-area-inset-bottom));min-height:50px;padding:0 20px;border-radius:26px;border:0;background:var(--acc);color:#fff;font-weight:700;box-shadow:0 3px 10px rgba(0,0,0,.28);z-index:4}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs button{flex:1;min-height:58px;background:none;border:0;color:var(--mute);font-size:12px;font-weight:650;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+nav.tabs button span{font-size:20px;line-height:1}
+nav.tabs button.on{color:var(--acc)}
+.calhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.calhead .lbl{flex:1;text-align:center;font-weight:700}
+.calhead button.arrow{width:46px;min-height:46px;border:1px solid var(--line);background:var(--card);border-radius:8px;font-size:22px}
+.ev{border-left:6px solid var(--acc)}
+.ev.t1{border-left-color:#2e8b57}.ev.t2{border-left-color:#c77d00}.ev.t3{border-left-color:#8e44ad}.ev.t4{border-left-color:var(--red)}.ev.t5{border-left-color:#5b6b74}.ev.t6{border-left-color:#7f8c8d}
+.evt{font-weight:700;font-size:14px;color:var(--mute);margin-bottom:2px}
+.dayh{display:flex;align-items:center;justify-content:space-between;margin:14px 0 6px;font-weight:700}
+.dayh.today{color:var(--acc)}
+.dayh button{min-height:36px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--card);font-weight:700}
+.nodrain .drainf{display:none}
+.hint{color:var(--mute);font-size:13px;margin:-6px 0 12px}
+#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#16252d;color:#fff;padding:10px 16px;border-radius:20px;font-size:14px;z-index:9;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.show{opacity:1}
+[hidden]{display:none!important}
+/* print */
+#print{display:none}
+#print h1{font-size:18px;margin:0}
+#print .ph{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #000;padding-bottom:4px;margin-bottom:8px}
+#print table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:10px}
+#print th,#print td{border:1px solid #000;padding:4px 5px;vertical-align:top;text-align:left}
+#print th{background:#e8e8e8}
+#print td.box{width:34px;height:22px}
+#print td.blank{height:26px}
+#print ul{margin:4px 0 10px 18px;padding:0}
+#print li{margin-bottom:3px}
+#print h2{font-size:13px;margin:10px 0 4px;color:#000}
+@media print{
+  body{background:#fff;color:#000;padding:0}
+  #app,nav.tabs,#toast{display:none!important}
+  #print{display:block}
+}
+</style>
+<style id="pgstyle"></style>
+</head>
+<body>
+<div id="app">
+  <header class="top"><button id="back" aria-label="Back" hidden>&#8249;</button><h1 id="title">PostOp Rounds</h1></header>
+  <main id="main"></main>
+  <nav class="tabs" id="tabs">
+    <button data-act="tab" data-v="patients"><span>&#9776;</span>Patients</button>
+    <button data-act="tab" data-v="schedule"><span>&#9638;</span>Schedule</button>
+    <button data-act="tab" data-v="surgeries"><span>&#9874;</span>Surgeries</button>
+    <button data-act="tab" data-v="data"><span>&#9881;</span>Data</button>
+  </nav>
+</div>
+<div id="print"></div>
+<div id="toast" role="status"></div>
+<input type="file" id="imp" accept="application/json,.json" hidden>
+
+<script>
+'use strict';
+/* ---------- helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parse = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const today = () => ymd(new Date());
+const dayDiff = (a, b) => Math.round((parse(b) - parse(a)) / 864e5);
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const fmt = s => s ? parse(s).toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) : '';
+const fmtShort = s => parse(s).toLocaleDateString('en-GB', {weekday: 'short', day: 'numeric', month: 'short'});
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const lines = t => (t || '').split('\n').map(x => x.trim()).filter(Boolean);
+let toastT;
+function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200); }
+
+/* ---------- built-in surgery templates (editable in the app) ---------- */
+/* Question format: "Question: normal option | !abnormal option | ..."  (a leading ! marks an abnormal answer) */
+function parseQ(line) {
+  const i = line.indexOf(':');
+  if (i < 0) return { q: line.trim(), opts: ['Normal', 'Abnormal'], abn: ['Abnormal'] };
+  const raw = line.slice(i + 1).split('|').map(x => x.trim()).filter(Boolean);
+  return { q: line.slice(0, i).trim(), opts: raw.map(o => o.replace(/^!/, '').trim()), abn: raw.filter(o => o.startsWith('!')).map(o => o.slice(1).trim()) };
+}
+const serQ = x => `${x.q}: ${x.opts.map(o => (x.abn.includes(o) ? '!' : '') + o).join(' | ')}`;
+const QS = arr => arr.map(parseQ);
+
+/* Asked at every visit, for every surgery type */
+const COMMON_Q = QS([
+  'Temperature: Afebrile | !Febrile',
+  'General condition: Comfortable | !Unwell',
+  'Chest: Clear | !Crepitations | !Wheeze',
+  'Calves: Soft, non-tender | !Swollen or tender'
+]);
+
+const GENERIC = {
+  id: 'other', name: 'Other / general',
+  exam: QS(['Abdomen: Soft | !Rigid | !Guarding', 'Distension: None | !Distended', 'Bowel sounds: Present | !Absent', 'Flatus: Passed | !Not passed', 'Oral intake: Tolerating | !Vomiting']),
+  flags: ['Tachycardia or hypotension', 'Worsening pain', 'Wound infection or discharge'],
+  advice: ['Keep the wound clean and dry', 'Take medicines as prescribed', 'Walk regularly and avoid heavy lifting until reviewed', 'Attend your follow-up appointment']
+};
+const DEFAULTS = [
+  { id: 'appendectomy', name: 'Appendectomy',
+    exam: QS(['Abdomen: Soft | !Rigid | !Guarding', 'Distension: None | !Distended', 'Tenderness: None or mild at wound | !Localised RIF | !Generalised', 'Bowel sounds: Present | !Absent', 'Flatus: Passed | !Not passed', 'Oral intake: Tolerating | !Vomiting', 'Diarrhoea or tenesmus: Absent | !Present']),
+    flags: ['Swinging fever (pelvic collection)', 'Tachycardia', 'Wound erythema or discharge'],
+    advice: ['Keep the wound clean and dry', 'Normal diet as tolerated', 'Avoid heavy lifting for 2 weeks', 'Take analgesia as prescribed', 'Wound check and histology review at follow-up'] },
+  { id: 'cholecystectomy', name: 'Cholecystectomy (laparoscopic / open)',
+    exam: QS(['Abdomen: Soft | !Rigid | !Guarding', 'Distension: None | !Distended', 'Sclera: Normal | !Icteric', 'Urine colour: Normal | !Dark', 'Stool colour: Normal | !Pale', 'Shoulder-tip pain: Absent | Present', 'Flatus: Passed | !Not passed', 'Oral intake: Tolerating | !Vomiting']),
+    flags: ['Rigors', 'Tachycardia or hypotension (bleeding)', 'Bile-stained fluid from wound or drain'],
+    advice: ['Low-fat diet at first, then normal as tolerated', 'Keep port sites clean and dry', 'Avoid heavy lifting for 2 weeks', 'Histology review at follow-up'] },
+  { id: 'inguinal-hernia', name: 'Inguinal hernia repair',
+    exam: QS(['Groin: Flat and soft | !Haematoma | !Swelling', 'Scrotum and testis: Normal | !Swollen | !Tender testis', 'Seroma: Absent | !Present', 'Bulge on cough: None | !Present', 'Bowel function: Normal | !Constipated | !Obstructive symptoms', 'Urine: Passing | !Retention']),
+    flags: ['Severe or increasing pain', 'Wound infection'],
+    advice: ['Expect some groin and scrotal bruising or swelling', 'Avoid heavy lifting and straining for 4 weeks', 'Avoid constipation, use laxatives if needed', 'Return to light activity as comfortable'] },
+  { id: 'ventral-hernia', name: 'Ventral / incisional hernia repair',
+    exam: QS(['Abdomen: Soft | !Rigid | !Guarding', 'Distension: None | !Distended', 'Skin flaps: Healthy | !Dusky | !Necrotic', 'Wound collection: None | !Seroma | !Haematoma', 'Flatus: Passed | !Not passed', 'Oral intake: Tolerating | !Vomiting', 'Breathing exercises: Doing | !Not doing']),
+    flags: ['Wound infection or discharge', 'Abdominal distension with vomiting (obstruction or ileus)'],
+    advice: ['Wear abdominal binder if advised', 'Avoid heavy lifting for 6 weeks', 'Avoid constipation and straining', 'Keep wound dry, report any discharge'] },
+  { id: 'thyroidectomy', name: 'Thyroidectomy',
+    exam: QS(['Neck: Flat and soft | !Swelling | !Tense haematoma', 'Voice: Normal | !Hoarse | !Weak', 'Breathing: Comfortable | !Stridor | !Dyspnoea', 'Perioral or finger tingling: Absent | !Present', 'Chvostek sign: Negative | !Positive', 'Trousseau sign: Negative | !Positive', 'Swallowing: Normal | !Difficult | !Choking', 'Serum calcium: Normal | !Low | Not checked']),
+    flags: ['Carpopedal spasm', 'Aspiration', 'Wound infection'],
+    advice: ['Take calcium and thyroid hormone exactly as prescribed', 'Report tingling around the mouth or fingers at once', 'Report neck swelling or breathing difficulty at once', 'Histology and hormone check at follow-up'] },
+  { id: 'mastectomy', name: 'Mastectomy / breast surgery',
+    exam: QS(['Skin flaps: Healthy | !Pale | !Dusky | !Necrotic', 'Collection: None | !Seroma | !Haematoma', 'Arm swelling: None | !Present', 'Shoulder movement: Full | !Restricted', 'Arm or axilla numbness: None | Present', 'Skin: Normal | !Erythema | !Cellulitis']),
+    flags: ['Persistent high drain output', 'Wound infection'],
+    advice: ['Begin arm and shoulder exercises as advised', 'Drain care teaching completed', 'Avoid blood pressure and needles on the operated arm if axillary surgery', 'Histology and oncology review at follow-up'] },
+  { id: 'colectomy', name: 'Colectomy / bowel resection',
+    exam: QS(['Abdomen: Soft | !Rigid | !Guarding', 'Distension: None | Mild | !Marked', 'Bowel sounds: Present | !Absent', 'Flatus or stool: Passed | !Not passed', 'Nausea or vomiting: None | !Present', 'Stoma: Not applicable | Pink and functioning | !Dusky | !Retracted | !Not functioning', 'NG tube: None | Low output | !High output', 'Urine output: Adequate | !Low']),
+    flags: ['Tachycardia or hypotension (possible leak)', 'Wound dehiscence or infection', 'Calf swelling or chest pain (DVT or PE)'],
+    advice: ['Progress diet slowly as advised', 'Stoma care teaching (if present)', 'Avoid heavy lifting for 6 weeks', 'Report fever, vomiting or wound discharge at once', 'Histology and oncology review at follow-up'] },
+  { id: 'haemorrhoidectomy', name: 'Haemorrhoidectomy',
+    exam: QS(['Bleeding per rectum: None | Minimal | !Heavy', 'Perianal area: Normal | !Swollen | !Tense and painful', 'Stool: Passed | !Not passed | !Impacted', 'Continence: Normal | !Incontinent', 'Urine: Passing | !Retention']),
+    flags: ['Perianal sepsis', 'Severe pain'],
+    advice: ['Warm sitz baths several times a day', 'Take laxatives and high-fibre diet', 'Take analgesia regularly', 'Return for heavy bleeding, fever or inability to pass urine'] },
+  { id: 'laparotomy', name: 'Laparotomy (emergency / general)',
+    exam: QS(['Haemodynamics: Stable | !Unstable', 'Abdomen: Soft | !Rigid | !Guarding', 'Distension: None | Mild | !Marked', 'Bowel sounds: Present | !Absent', 'Flatus or stool: Passed | !Not passed', 'NG tube: None | Low output | !High output', 'Urine output: Adequate | !Low', 'Wound: Intact | !Discharging | !Dehisced']),
+    flags: ['Feculent, bilious or bloody drain output', 'Persistent vomiting', 'Calf swelling or chest pain'],
+    advice: ['Wear abdominal support if advised', 'Avoid heavy lifting for 6 weeks', 'Progress diet as advised', 'Report fever, vomiting or wound discharge at once'] },
+  GENERIC
+];
+const DRAIN_TYPES = ['Vacuum drain (Redivac)', 'Tube drain', 'Abdominal drain', 'Neck drain', 'Breast / axillary drain', 'Other'];
+const DRAIN_CHARS = ['Serous', 'Serosanguinous', 'Bloody', 'Bilious', 'Purulent', 'Feculent'];
+const EV_TYPES = ['Operating list', 'Clinic', 'Ward round', 'On-call', 'Emergency theatre', 'Teaching / meeting', 'Other'];
+
+/* ---------- storage (IndexedDB, localStorage fallback) ---------- */
+const S = { patients: [], surgeries: [], events: [], settings: { weekStart: 0 } };
+let dbp;
+const db = () => dbp || (dbp = new Promise((res, rej) => {
+  const r = indexedDB.open('postop-rounds', 1);
+  r.onupgradeneeded = () => r.result.createObjectStore('kv');
+  r.onsuccess = () => res(r.result);
+  r.onerror = () => rej(r.error);
+}));
+async function kvGet(k) {
+  try {
+    const d = await db();
+    return await new Promise((res, rej) => { const q = d.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); });
+  } catch (e) { const v = localStorage.getItem('postop:' + k); return v ? JSON.parse(v) : undefined; }
+}
+async function kvSet(k, v) {
+  try {
+    const d = await db();
+    await new Promise((res, rej) => { const t = d.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = res; t.onerror = () => rej(t.error); });
+  } catch (e) { localStorage.setItem('postop:' + k, JSON.stringify(v)); }
+}
+const save = k => kvSet(k, S[k]).catch(() => toast('Could not save. Storage unavailable.'));
+async function load() {
+  for (const k of ['patients', 'surgeries', 'events', 'settings']) {
+    const v = await kvGet(k);
+    if (v !== undefined) S[k] = v;
+  }
+  if (!S.surgeries.length) { S.surgeries = JSON.parse(JSON.stringify(DEFAULTS)); save('surgeries'); }
+  // v1 stored the checklist as plain strings: upgrade to choice questions
+  let mig = false;
+  S.surgeries.forEach((sg, i) => {
+    if (sg.exam.length && typeof sg.exam[0] === 'string') {
+      const d = DEFAULTS.find(x => x.id === sg.id);
+      sg.exam = d ? JSON.parse(JSON.stringify(d.exam)) : sg.exam.map(t => ({ q: t, opts: ['Yes', 'No'], abn: [] }));
+      mig = true;
+    }
+  });
+  if (mig) save('surgeries');
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
+}
+
+/* ---------- state + navigation ---------- */
+const ui = { filter: 'active', q: '', calDate: today(), calMode: 'day' };
+let stack = [], view = { name: 'patients' };
+const getP = id => S.patients.find(p => p.id === id);
+const redOf = v => [...(v.abn || []), ...(v.flags || [])];
+const allQ = p => COMMON_Q.concat(surg(p).exam);
+const surg = p => S.surgeries.find(s => s.id === p.surgId) || GENERIC;
+const podOf = (p, ref) => dayDiff(p.opDate, ref || today());
+const lastVisit = p => [...p.visits].sort((a, b) => b.date.localeCompare(a.date))[0];
+const drainLine = p => !p.drain || !p.drain.has ? 'No drain' : `${p.drain.type || 'Drain'}${p.drain.site ? ' (' + p.drain.site + ')' : ''}${p.drain.removedDate ? ', removed ' + fmt(p.drain.removedDate) : ', in situ'}`;
+
+function go(name, params = {}) { stack.push(view); view = { name, ...params }; history.pushState({}, ''); render(); scrollTo(0, 0); }
+function done() { if (stack.length) history.back(); else render(); }
+window.addEventListener('popstate', () => { if (stack.length) { view = stack.pop(); render(); } });
+function setTab(t) { stack = []; view = { name: t }; render(); scrollTo(0, 0); }
+
+const VIEWS = { patients: vPatients, patient: vPatient, patientForm: vPatientForm, visit: vVisit, schedule: vSchedule, eventForm: vEventForm, surgeries: vSurgeries, surgeryForm: vSurgeryForm, data: vData };
+function render() {
+  const o = VIEWS[view.name](view);
+  $('#title').textContent = o.title;
+  $('#back').hidden = !stack.length;
+  $('#main').innerHTML = o.html;
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === o.tab));
+}
+
+/* ---------- form widgets ---------- */
+const chipRow = (name, opts, val, abn = []) => `<div class="chips">${opts.map(o => `<label class="chip${abn.includes(o) ? ' bad' : ''}"><input type="radio" name="${name}" value="${esc(o)}"${o === val ? ' checked' : ''}><span>${esc(o)}</span></label>`).join('')}</div>`;
+const mcq = (name, label, opts, val, abn = []) => `<fieldset class="mcq"><legend>${esc(label)}</legend>${opts.map((o, i) => `<label class="opt${abn.includes(o) ? ' bad' : ''}"><input type="radio" name="${name}" value="${esc(o)}"${o === val ? ' checked' : ''}><b>${'ABCDEFGH'[i] || i + 1}</b><span>${esc(o)}</span></label>`).join('')}</fieldset>`;
+const GEN_Q = [
+  { name: 'diet', q: 'Diet', opts: ['Nil by mouth', 'Sips', 'Liquids', 'Soft', 'Normal'], abn: [] },
+  { name: 'bowel', q: 'Bowels', opts: ['Nil', 'Flatus', 'Stool'], abn: [] },
+  { name: 'urine', q: 'Urine', opts: ['Catheter', 'Passing', 'Retention'], abn: ['Retention'] },
+  { name: 'mob', q: 'Mobility', opts: ['In bed', 'Sitting', 'Walking'], abn: [] },
+  { name: 'wound', q: 'Wound', opts: ['Clean and dry', 'Ooze', 'Erythema', 'Discharge', 'Gaping'], abn: ['Erythema', 'Discharge', 'Gaping'] }
+];
+const DRAIN_ABN = ['Bloody', 'Bilious', 'Purulent', 'Feculent'];
+const tickList = (name, items, sel = [], cls = '') => [...new Set([...items, ...sel])].map(t => `<label class="tick ${cls}"><input type="checkbox" name="${name}" value="${esc(t)}"${sel.includes(t) ? ' checked' : ''}><span>${esc(t)}</span></label>`).join('');
+const opts = (arr, val) => arr.map(o => `<option value="${esc(o)}"${o === val ? ' selected' : ''}>${esc(o)}</option>`).join('');
+
+/* ---------- patients ---------- */
+function plist() {
+  const q = ui.q.toLowerCase();
+  const list = S.patients.filter(p => (ui.filter === 'all' || p.status === ui.filter) && (!q || `${p.name} ${p.surgName} ${p.bed || ''}`.toLowerCase().includes(q)))
+    .sort((a, b) => a.status.localeCompare(b.status) || b.opDate.localeCompare(a.opDate));
+  if (!list.length) return `<div class="card sub">${S.patients.length ? 'No patients match.' : 'No patients yet. Tap "Add patient" to start.'}</div>`;
+  return list.map(p => {
+    const disch = p.status === 'discharged';
+    const n = disch ? dayDiff(p.opDate, p.dischargeDate) : podOf(p);
+    const lv = lastVisit(p);
+    const flag = lv && redOf(lv).length;
+    const unseen = !disch && !p.visits.some(v => v.date === today());
+    return `<button class="pcard" data-act="openP" data-id="${p.id}">
+      <div class="pod${disch ? ' done' : ''}"><small>POD</small><b>${n}</b></div>
+      <div><div class="pname">${esc(p.name)}</div>
+      <div class="sub">${[p.age ? 'Age ' + esc(p.age) : '', esc(p.sex), p.bed ? 'Bed ' + esc(p.bed) : ''].filter(Boolean).join(', ')}</div>
+      <div class="sub">${esc(p.surgName)}, ${fmt(p.opDate)}</div>
+      <div class="tags">${disch ? '<span class="tag grn">Discharged</span>' : ''}${p.drain && p.drain.has && !p.drain.removedDate ? '<span class="tag">Drain</span>' : ''}${flag ? '<span class="tag red">Red flag</span>' : ''}${unseen ? '<span class="tag amb">Not seen today</span>' : ''}</div></div></button>`;
+  }).join('');
+}
+function vPatients() {
+  const stale = S.patients.length && (!S.settings.lastBackup || dayDiff(S.settings.lastBackup, today()) > 14);
+  const seg = ['active', 'discharged', 'all'].map(f => `<button class="seg${ui.filter === f ? ' on' : ''}" data-act="filter" data-v="${f}">${cap(f)}</button>`).join('');
+  return { title: 'Patients', tab: 'patients', html: `
+    ${stale ? '<div class="note amb">No backup in the last 2 weeks. <button class="lnk" data-act="tab" data-v="data">Back up now</button></div>' : ''}
+    <input id="q" type="search" placeholder="Search name, bed or procedure" value="${esc(ui.q)}">
+    <div class="segs">${seg}</div>
+    <div id="plist">${plist()}</div>
+    <div class="row"><button class="btn ghost grow" data-act="printWard">Print ward list</button></div>
+    <button class="fab" data-act="newP">+ Add patient</button>` };
+}
+
+function vPatient({ id }) {
+  const p = getP(id);
+  if (!p) return { title: 'Patient', tab: 'patients', html: '<p>Patient not found.</p>' };
+  const disch = p.status === 'discharged';
+  const n = disch ? dayDiff(p.opDate, p.dischargeDate) : podOf(p);
+  const vis = [...p.visits].sort((a, b) => b.date.localeCompare(a.date));
+  const vcards = vis.map(v => {
+    const vit = [v.temp && `T ${esc(v.temp)}`, v.pulse && `P ${esc(v.pulse)}`, v.bp && `BP ${esc(v.bp)}`, v.pain !== '' && `Pain ${esc(v.pain)}/10`].filter(Boolean).join(', ');
+    const gen = [v.diet && `Diet: ${esc(v.diet)}`, v.bowel && `Bowels: ${esc(v.bowel)}`, v.urine && `Urine: ${esc(v.urine)}`, v.mob && esc(v.mob), v.wound && `Wound: ${esc(v.wound)}`].filter(Boolean).join(', ');
+    const dr = (v.drainMl || v.drainChar || v.drainAct) ? `Drain: ${[v.drainMl && esc(v.drainMl) + ' ml', esc(v.drainChar), esc(v.drainAct)].filter(Boolean).join(', ')}` : '';
+    return `<button class="vcard" data-act="editVisit" data-pid="${p.id}" data-vid="${v.id}">
+      <div class="vh"><b>POD ${dayDiff(p.opDate, v.date)}</b><span class="sub">${fmt(v.date)}</span>${v.plan ? `<span class="tag${v.plan === 'Discharged' ? ' grn' : ''}">${esc(v.plan)}</span>` : ''}</div>
+      ${vit ? `<div class="sub">${vit}</div>` : ''}${gen ? `<div class="sub">${gen}</div>` : ''}${dr ? `<div class="sub">${dr}</div>` : ''}
+      ${v.ans && Object.keys(v.ans).length ? `<div class="sub">${Object.entries(v.ans).map(([q, a]) => esc(q) + ': ' + esc(a)).join(', ')}</div>` : ''}
+      ${redOf(v).length ? `<div class="flagtxt">Red flags: ${redOf(v).map(esc).join('; ')}</div>` : ''}
+      ${v.note ? `<div>${esc(v.note)}</div>` : ''}</button>`;
+  }).join('');
+  return { title: 'Patient', tab: 'patients', html: `
+    <div class="card" style="display:flex;gap:12px;align-items:center">
+      <div class="pod big${disch ? ' done' : ''}"><small>POD</small><b>${n}</b></div>
+      <div><div class="pname">${esc(p.name)}</div>
+      <div class="sub">${[p.age ? 'Age ' + esc(p.age) : '', esc(p.sex), p.bed ? 'Bed ' + esc(p.bed) : ''].filter(Boolean).join(', ')}</div>
+      <div>${esc(p.surgName)}</div><div class="sub">Operated ${fmt(p.opDate)}${disch ? ', discharged ' + fmt(p.dischargeDate) : ''}</div></div>
+    </div>
+    <div class="card"><div class="sub">${esc(drainLine(p))}</div>${p.notes ? `<div style="margin-top:6px;white-space:pre-wrap">${esc(p.notes)}</div>` : ''}</div>
+    <div class="row"><button class="btn grow" data-act="newVisit" data-id="${p.id}">Add visit</button><button class="btn ghost" data-act="editP" data-id="${p.id}">Edit patient</button></div>
+    <h3>Print</h3>
+    <div class="row"><button class="btn ghost grow" data-act="printSheet" data-id="${p.id}">Follow-up sheet</button><button class="btn ghost grow" data-act="printGrid" data-id="${p.id}">Checklist grid</button><button class="btn ghost grow" data-act="printAdvice" data-id="${p.id}">Discharge advice</button></div>
+    <h3>Visits (${vis.length})</h3>
+    ${vcards || '<div class="card sub">No visits yet.</div>'}` };
+}
+
+function vPatientForm({ id }) {
+  const p = id ? getP(id) : null;
+  const d = p && p.drain || {};
+  return { title: p ? 'Edit patient' : 'New patient', tab: 'patients', html: `
+    <form data-form="patient" data-id="${id || ''}" class="${d.has ? '' : 'nodrain'}">
+      <label class="f">Name or file number<input type="text" name="name" required value="${esc(p && p.name)}" autocomplete="off"></label>
+      <div class="hint">Tip: use initials or a file number rather than the full name.</div>
+      <div class="grid2">
+        <label class="f">Age<input type="number" name="age" inputmode="numeric" min="0" max="120" value="${esc(p && p.age)}"></label>
+        <label class="f">Sex<select name="sex"><option value=""></option>${opts(['Male', 'Female'], p && p.sex)}</select></label>
+      </div>
+      <label class="f">Bed or ward<input type="text" name="bed" value="${esc(p && p.bed)}"></label>
+      <label class="f">Type of surgery<select name="surgId" required>${S.surgeries.map(s => `<option value="${esc(s.id)}"${p && p.surgId === s.id ? ' selected' : ''}>${esc(s.name)}</option>`).join('')}</select></label>
+      <label class="f">Date of surgery<input type="date" name="opDate" required value="${esc(p ? p.opDate : today())}"></label>
+      <label class="f">Diagnosis and operative notes<textarea name="notes">${esc(p && p.notes)}</textarea></label>
+      <label class="f">Drain<select name="hasDrain"><option value="No">No drain</option><option value="Yes"${d.has ? ' selected' : ''}>Drain in place</option></select></label>
+      <div class="drainf">
+        <label class="f">Drain type<select name="drainType">${opts(DRAIN_TYPES, d.type)}</select></label>
+        <label class="f">Drain site<input type="text" name="drainSite" value="${esc(d.site)}"></label>
+      </div>
+      <div class="row"><button class="btn grow" type="submit">Save patient</button>${p ? `<button class="btn danger" type="button" data-act="delP" data-id="${p.id}">Delete</button>` : ''}</div>
+    </form>` };
+}
+
+function vVisit({ pid, vid }) {
+  const p = getP(pid);
+  const v = vid ? p.visits.find(x => x.id === vid) : null;
+  const s = surg(p);
+  const date = v ? v.date : today();
+  const showDrain = p.drain && p.drain.has && (!p.drain.removedDate || date <= p.drain.removedDate);
+  const g = k => esc(v && v[k]);
+  return { title: v ? 'Edit visit' : 'New visit', tab: 'patients', html: `
+    <form data-form="visit" data-pid="${p.id}" data-vid="${vid || ''}" data-nq="${allQ(p).length}">
+      <div class="card"><b>${esc(p.name)}</b><div class="sub">${esc(p.surgName)}</div></div>
+      <div class="grid2">
+        <label class="f">Date<input type="date" name="date" required value="${date}"></label>
+        <div class="f">Post-op day<div id="podlbl" class="pname" style="margin-top:12px">POD ${dayDiff(p.opDate, date)}</div></div>
+      </div>
+      <h3>Vitals</h3>
+      <div class="grid2">
+        <label class="f">Temp (&deg;C)<input type="number" name="temp" step="0.1" inputmode="decimal" value="${g('temp')}"></label>
+        <label class="f">Pulse<input type="number" name="pulse" inputmode="numeric" value="${g('pulse')}"></label>
+        <label class="f">BP<input type="text" name="bp" placeholder="120/80" value="${g('bp')}"></label>
+        <label class="f">Pain (0-10)<select name="pain"><option value=""></option>${opts([...Array(11).keys()].map(String), v && String(v.pain))}</select></label>
+      </div>
+      <h3>General</h3>
+      ${GEN_Q.map(x => mcq(x.name, x.q, x.opts, v && v[x.name], x.abn)).join('')}
+      <h3>Examination: ${esc(s.name)}</h3>
+      <div class="prog" id="prog">Answered ${allQ(p).filter(x => v && v.ans && v.ans[x.q]).length} of ${allQ(p).length}</div>
+      ${allQ(p).map((x, i) => mcq('a' + i, `Q${i + 1}. ${x.q}?`, x.opts, v && v.ans && v.ans[x.q], x.abn)).join('')}
+      <h3>Other warning signs</h3>
+      <div class="hint">Tick only if present.</div>
+      ${tickList('flags', s.flags, v ? v.flags : [], 'red')}
+      ${showDrain ? `<h3>Drain</h3>
+        <label class="f">Output (ml per 24 h)<input type="number" name="drainMl" inputmode="numeric" value="${g('drainMl')}"></label>
+        ${mcq('drainChar', 'Drain character', DRAIN_CHARS, v && v.drainChar, DRAIN_ABN)}
+        ${mcq('drainAct', 'Drain action', ['Continue', 'Removed'], v && v.drainAct)}` : ''}
+      <h3>Plan</h3>
+      ${mcq('plan', 'Plan', ['Continue inpatient care', 'Ready for discharge', 'Discharged'], v && v.plan)}
+      <label class="f">Note<textarea name="note">${g('note')}</textarea></label>
+      <div class="row"><button class="btn grow" type="submit">Save visit</button>${v ? `<button class="btn danger" type="button" data-act="delVisit" data-pid="${p.id}" data-vid="${v.id}">Delete</button>` : ''}</div>
+    </form>` };
+}
+
+function recalc(p) {
+  p.visits.sort((a, b) => a.date.localeCompare(b.date));
+  const rem = p.visits.find(v => v.drainAct === 'Removed');
+  if (p.drain) p.drain.removedDate = rem ? rem.date : '';
+  const dis = p.visits.find(v => v.plan === 'Discharged');
+  p.status = dis ? 'discharged' : 'active';
+  p.dischargeDate = dis ? dis.date : '';
+}
+
+/* ---------- schedule ---------- */
+const evSort = (a, b) => a.date.localeCompare(b.date) || (a.start || '').localeCompare(b.start || '');
+const weekDays = d => {
+  const dt = parse(d), off = (dt.getDay() - S.settings.weekStart + 7) % 7, st = addDays(dt, -off);
+  return [...Array(7).keys()].map(i => ymd(addDays(st, i)));
+};
+const evTime = e => e.start ? e.start + (e.end ? '-' + e.end : '') : 'All day';
+function evCard(e) {
+  return `<button class="ev t${Math.max(0, EV_TYPES.indexOf(e.type))}" data-act="editEvent" data-id="${e.id}">
+    <div class="evt">${esc(evTime(e))}</div><b>${esc(e.title)}</b>
+    <div class="sub">${esc(e.type)}${e.place ? ', ' + esc(e.place) : ''}</div>${e.note ? `<div class="sub">${esc(e.note)}</div>` : ''}</button>`;
+}
+function vSchedule() {
+  const days = ui.calMode === 'day' ? [ui.calDate] : weekDays(ui.calDate);
+  const label = ui.calMode === 'day' ? fmt(ui.calDate) : `${fmtShort(days[0])} to ${fmtShort(days[6])}`;
+  const step = ui.calMode === 'day' ? 1 : 7;
+  const active = S.patients.filter(p => p.status === 'active').length;
+  const body = days.map(d => {
+    const ev = S.events.filter(e => e.date === d).sort(evSort);
+    const head = ui.calMode === 'week' ? `<div class="dayh${d === today() ? ' today' : ''}"><span>${fmtShort(d)}</span><button data-act="newEvent" data-date="${d}">+ Add</button></div>` : '';
+    return head + (ev.map(evCard).join('') || (ui.calMode === 'day' ? '<div class="card sub">Nothing scheduled. Add an operating list, clinic or ward round.</div>' : '<div class="sub">No events</div>'));
+  }).join('');
+  return { title: 'Schedule', tab: 'schedule', html: `
+    <div class="calhead"><button class="arrow" data-act="calStep" data-v="-${step}" aria-label="Previous">&#8249;</button><div class="lbl">${label}</div><button class="arrow" data-act="calStep" data-v="${step}" aria-label="Next">&#8250;</button></div>
+    <div class="segs"><button class="seg${ui.calMode === 'day' ? ' on' : ''}" data-act="calMode" data-v="day">Day</button><button class="seg${ui.calMode === 'week' ? ' on' : ''}" data-act="calMode" data-v="week">Week</button><button class="seg" data-act="calToday">Today</button></div>
+    ${ui.calMode === 'day' && active ? `<div class="note" style="background:var(--acc-soft);color:var(--acc)">${active} inpatient${active > 1 ? 's' : ''} on the ward. <button class="lnk" data-act="printWard">Print ward list</button></div>` : ''}
+    ${body}
+    <div class="row"><button class="btn ghost grow" data-act="printSched">Print ${ui.calMode === 'day' ? 'day' : 'week'}</button></div>
+    ${ui.calMode === 'day' ? '<button class="fab" data-act="newEvent" data-date="' + ui.calDate + '">+ Add event</button>' : ''}` };
+}
+function vEventForm({ id, date }) {
+  const e = id ? S.events.find(x => x.id === id) : null;
+  return { title: e ? 'Edit event' : 'New event', tab: 'schedule', html: `
+    <form data-form="event" data-id="${id || ''}">
+      <label class="f">Type<select name="type">${opts(EV_TYPES, e && e.type)}</select></label>
+      <label class="f">Title<input type="text" name="title" placeholder="e.g. Elective list, Theatre 2" value="${esc(e && e.title)}"></label>
+      <label class="f">Date<input type="date" name="date" required value="${esc(e ? e.date : date || ui.calDate)}"></label>
+      <div class="grid2">
+        <label class="f">Start<input type="time" name="start" value="${esc(e && e.start)}"></label>
+        <label class="f">End<input type="time" name="end" value="${esc(e && e.end)}"></label>
+      </div>
+      <label class="f">Place<input type="text" name="place" value="${esc(e && e.place)}"></label>
+      <label class="f">Note<textarea name="note">${esc(e && e.note)}</textarea></label>
+      ${e ? '' : `<div class="grid2"><label class="f">Repeat<select name="repeat"><option value="none">Does not repeat</option><option value="weekly">Every week</option></select></label>
+        <label class="f">For how many weeks<select name="weeks">${[2, 3, 4, 6, 8, 12, 26].map(n => `<option value="${n}">${n}</option>`).join('')}</select></label></div>`}
+      <div class="row"><button class="btn grow" type="submit">Save event</button>${e ? `<button class="btn danger" type="button" data-act="delEvent" data-id="${e.id}">Delete</button>` : ''}</div>
+    </form>` };
+}
+
+/* ---------- surgeries ---------- */
+function vSurgeries() {
+  return { title: 'Surgery types', tab: 'surgeries', html: `
+    <div class="hint" style="margin-top:0">Each type has its own examination checklist, red flags and discharge advice. Edit them or add your own.</div>
+    ${S.surgeries.map(s => `<button class="lrow" data-act="editSurg" data-id="${esc(s.id)}"><b>${esc(s.name)}</b><div class="sub">${s.exam.length} exam questions, ${s.flags.length} warning signs</div></button>`).join('')}
+    <button class="fab" data-act="newSurg">+ Add surgery</button>` };
+}
+function vSurgeryForm({ id }) {
+  const s = id ? S.surgeries.find(x => x.id === id) : null;
+  return { title: s ? 'Edit surgery type' : 'New surgery type', tab: 'surgeries', html: `
+    <form data-form="surgery" data-id="${id || ''}">
+      <label class="f">Name<input type="text" name="name" required value="${esc(s && s.name)}"></label>
+      <label class="f">Examination questions<textarea name="exam" rows="10">${esc(s ? s.exam.map(serQ).join('\n') : '')}</textarea></label>
+      <div class="hint">One question per line, as: Question: normal answer | !abnormal answer | !another abnormal. Put ! before any answer that is abnormal. Example: Abdomen: Soft | !Rigid | !Guarding</div>
+      <label class="f">Other warning signs<textarea name="flags" rows="6">${esc(s ? s.flags.join('\n') : '')}</textarea></label>
+      <div class="hint">One per line. These are ticked when present and also printed on the discharge advice.</div>
+      <label class="f">Discharge advice (printed)<textarea name="advice" rows="6">${esc(s ? s.advice.join('\n') : '')}</textarea></label>
+      <div class="row"><button class="btn grow" type="submit">Save surgery type</button>${s ? `<button class="btn danger" type="button" data-act="delSurg" data-id="${esc(s.id)}">Delete</button>` : ''}</div>
+    </form>` };
+}
+
+/* ---------- data / settings ---------- */
+function vData() {
+  const lb = S.settings.lastBackup;
+  return { title: 'Data and settings', tab: 'data', html: `
+    <div class="card"><b>${S.patients.length}</b> patients, <b>${S.events.length}</b> events, <b>${S.surgeries.length}</b> surgery types stored on this phone.
+      <div class="sub">Last backup: ${lb ? fmt(lb) : 'never'}</div></div>
+    <div class="row"><button class="btn grow" data-act="export">Export backup</button><button class="btn ghost grow" data-act="import">Import backup</button></div>
+    <div class="hint">Import merges the file into your current data. Nothing is deleted.</div>
+    <label class="f">Week starts on<select data-set="weekStart"><option value="0"${S.settings.weekStart === 0 ? ' selected' : ''}>Sunday</option><option value="6"${S.settings.weekStart === 6 ? ' selected' : ''}>Saturday</option><option value="1"${S.settings.weekStart === 1 ? ' selected' : ''}>Monday</option></select></label>
+    <h3>App</h3>
+    <div class="row"><button class="btn ghost grow" data-act="restoreSurg">Restore built-in surgery types</button></div>
+    <div class="row"><button class="btn ghost grow" data-act="updateApp">Update app (needs internet)</button></div>
+    <div class="row"><button class="btn danger grow" data-act="wipe">Delete all data</button></div>
+    <h3>Install on your phone</h3>
+    <div class="card sub"><b>iPhone:</b> open the link in Safari, tap Share, then Add to Home Screen.<br><b>Android:</b> open in Chrome, tap the menu, then Install app.<br>Open it once online. After that it works offline.</div>
+    <div class="sub">PostOp Rounds v3. Data stays on this phone. Checklists are starting templates: check them against your unit protocols.</div>` };
+}
+async function exportData() {
+  const data = JSON.stringify({ app: 'postop-rounds', v: 1, exported: new Date().toISOString(), patients: S.patients, surgeries: S.surgeries, events: S.events, settings: S.settings }, null, 1);
+  const name = `postop-backup-${today()}.json`;
+  const file = new File([data], name, { type: 'application/json' });
+  S.settings.lastBackup = today(); save('settings');
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: name }); return; } catch (e) { if (e.name === 'AbortError') return; }
+  }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  toast('Backup exported'); render();
+}
+async function importFile(f) {
+  if (!f) return;
+  try {
+    const d = JSON.parse(await f.text());
+    if (d.app !== 'postop-rounds') throw new Error('bad');
+    const merge = (k, arr) => { (arr || []).forEach(it => { const i = S[k].findIndex(x => x.id === it.id); if (i >= 0) S[k][i] = it; else S[k].push(it); }); save(k); };
+    merge('surgeries', d.surgeries); merge('patients', d.patients); merge('events', d.events);
+    toast('Backup imported'); render();
+  } catch (e) { toast('That file is not a PostOp backup.'); }
+  $('#imp').value = '';
+}
+async function updateApp() {
+  if (!navigator.onLine) { toast('Connect to the internet to update.'); return; }
+  try {
+    if (navigator.serviceWorker) for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister();
+    if (window.caches) for (const k of await caches.keys()) await caches.delete(k);
+  } catch (e) {}
+  location.reload();
+}
+
+/* ---------- printing ---------- */
+function doPrint(html, landscape) {
+  $('#pgstyle').textContent = `@page{size:A4 ${landscape ? 'landscape' : 'portrait'};margin:12mm}`;
+  $('#print').innerHTML = html;
+  setTimeout(() => window.print(), 80);
+}
+const ph = t => `<div class="ph"><h1>${esc(t)}</h1><div>Printed ${fmt(today())}</div></div>`;
+const td = x => `<td>${esc(x)}</td>`;
+const patHead = p => `<table><tr><th>Name / file no.</th>${td(p.name)}<th>Age / sex</th>${td([p.age, p.sex].filter(Boolean).join(' / '))}<th>Bed</th>${td(p.bed)}</tr>
+  <tr><th>Procedure</th>${td(p.surgName)}<th>Date of surgery</th>${td(fmt(p.opDate))}<th>Drain</th>${td(drainLine(p))}</tr>
+  <tr><th>Notes</th><td colspan="5" style="white-space:pre-wrap">${esc(p.notes)}</td></tr></table>`;
+
+function printSheet(p) {
+  const rows = [...p.visits].sort((a, b) => a.date.localeCompare(b.date)).map(v => `<tr>${td(fmt(v.date))}${td(dayDiff(p.opDate, v.date))}${td(v.temp)}${td(v.pulse)}${td(v.bp)}${td(v.pain)}${td([v.diet, v.bowel, v.urine, v.mob].filter(Boolean).join(', '))}${td(v.wound)}${td([v.drainMl && v.drainMl + ' ml', v.drainChar, v.drainAct].filter(Boolean).join(', '))}${td((v.abn || []).join('; '))}${td((v.flags || []).join('; '))}${td([v.plan, v.note].filter(Boolean).join('. '))}</tr>`).join('');
+  const blank = Array(4).fill('<tr>' + '<td class="blank"></td>'.repeat(12) + '</tr>').join('');
+  doPrint(`${ph('Post-operative follow-up sheet')}${patHead(p)}
+    <table><tr><th>Date</th><th>POD</th><th>Temp</th><th>Pulse</th><th>BP</th><th>Pain</th><th>Diet, bowels, urine, mobility</th><th>Wound</th><th>Drain</th><th>Abnormal findings</th><th>Other warning signs</th><th>Plan / note</th></tr>${rows}${blank}</table>`, true);
+}
+function printGrid(p) {
+  const s = surg(p), cols = [1, 2, 3, 4, 5, 6, 7];
+  const head = `<tr><th>POD</th>${cols.map(c => `<th>${c}</th>`).join('')}</tr><tr><th>Date</th>${cols.map(() => '<td class="box"></td>').join('')}</tr>`;
+  const sec = (t, items) => `<tr><th colspan="8">${esc(t)}</th></tr>` + items.map(i => `<tr>${td(i)}${cols.map(() => '<td class="box"></td>').join('')}</tr>`).join('');
+  const secQ = (t, qs) => `<tr><th colspan="8">${esc(t)}</th></tr>` + qs.map(x => `<tr><td>${esc(x.q)}: ${x.opts.map(esc).join(' / ')}</td>${cols.map(() => '<td class="box"></td>').join('')}</tr>`).join('');
+  doPrint(`${ph('Post-operative checklist: ' + s.name)}${patHead(p)}
+    <table>${head}${sec('Vitals', ['Temperature', 'Pulse', 'BP', 'Pain (0-10)'])}${secQ('Examination (circle the answer or write its initial)', allQ(p))}${sec('Other warning signs (tick if present)', s.flags)}${sec('Drain', ['Output (ml)', 'Character', 'Removed'])}${sec('Plan', ['Discharge', 'Note'])}</table>`, false);
+}
+function printAdvice(p) {
+  const s = surg(p);
+  doPrint(`${ph('Discharge advice')}${patHead(p)}
+    <h2>Advice</h2><ul>${s.advice.map(a => `<li>${esc(a)}</li>`).join('')}</ul>
+    <h2>Return to hospital immediately if you have</h2><ul>${s.flags.map(a => `<li>${esc(a)}</li>`).join('')}</ul>
+    <table><tr><th style="width:25%">Follow-up date</th><td class="blank"></td><th style="width:25%">Doctor's signature</th><td class="blank"></td></tr></table>`, false);
+}
+function printWard() {
+  const list = S.patients.filter(p => p.status === 'active').sort((a, b) => (a.bed || '').localeCompare(b.bed || '', undefined, { numeric: true }));
+  const rows = list.map(p => {
+    const lv = lastVisit(p);
+    const last = lv ? `${fmt(lv.date)}: ${[lv.temp && 'T ' + lv.temp, lv.pulse && 'P ' + lv.pulse, lv.bp && 'BP ' + lv.bp].filter(Boolean).join(', ')}${redOf(lv).length ? '. FLAGS: ' + redOf(lv).join('; ') : ''}` : '';
+    return `<tr>${td(p.bed)}${td(p.name)}${td([p.age, p.sex].filter(Boolean).join(' / '))}${td(p.surgName)}${td(fmt(p.opDate))}${td(podOf(p))}${td(drainLine(p))}${td(last)}<td class="blank"></td></tr>`;
+  }).join('');
+  doPrint(`${ph('Ward list, ' + list.length + ' patients')}<table><tr><th>Bed</th><th>Name</th><th>Age / sex</th><th>Procedure</th><th>Operated</th><th>POD</th><th>Drain</th><th>Last visit</th><th style="width:22%">Today: findings and plan</th></tr>${rows || '<tr><td colspan="9">No active patients.</td></tr>'}</table>`, true);
+}
+function printSched() {
+  const days = ui.calMode === 'day' ? [ui.calDate] : weekDays(ui.calDate);
+  const rows = days.map(d => {
+    const ev = S.events.filter(e => e.date === d).sort(evSort);
+    if (!ev.length) return `<tr>${td(fmtShort(d))}<td colspan="4">-</td></tr>`;
+    return ev.map((e, i) => `<tr>${i ? '<td></td>' : td(fmtShort(d))}${td(evTime(e))}${td(e.type)}${td([e.title, e.place, e.note].filter(Boolean).join(' | '))}<td class="blank"></td></tr>`).join('');
+  }).join('');
+  doPrint(`${ph(ui.calMode === 'day' ? 'Daily schedule, ' + fmt(ui.calDate) : 'Weekly schedule, ' + fmt(days[0]) + ' to ' + fmt(days[6]))}<table><tr><th>Day</th><th>Time</th><th>Type</th><th>Details</th><th style="width:20%">Notes</th></tr>${rows}</table>`, false);
+}
+
+/* ---------- actions ---------- */
+const ACT = {
+  tab: d => setTab(d.v),
+  filter: d => { ui.filter = d.v; render(); },
+  newP: () => go('patientForm', {}),
+  openP: d => go('patient', { id: d.id }),
+  editP: d => go('patientForm', { id: d.id }),
+  delP: d => { if (confirm('Delete this patient and all visits? This cannot be undone.')) { S.patients = S.patients.filter(p => p.id !== d.id); save('patients'); stack = []; view = { name: 'patients' }; render(); toast('Patient deleted'); } },
+  newVisit: d => go('visit', { pid: d.id }),
+  editVisit: d => go('visit', { pid: d.pid, vid: d.vid }),
+  delVisit: d => { if (confirm('Delete this visit?')) { const p = getP(d.pid); p.visits = p.visits.filter(v => v.id !== d.vid); recalc(p); save('patients'); done(); } },
+  printWard, printSched,
+  printSheet: d => printSheet(getP(d.id)), printGrid: d => printGrid(getP(d.id)), printAdvice: d => printAdvice(getP(d.id)),
+  calStep: d => { ui.calDate = ymd(addDays(parse(ui.calDate), +d.v)); render(); },
+  calMode: d => { ui.calMode = d.v; render(); },
+  calToday: () => { ui.calDate = today(); render(); },
+  newEvent: d => go('eventForm', { date: d.date }),
+  editEvent: d => go('eventForm', { id: d.id }),
+  delEvent: d => { if (confirm('Delete this event?')) { S.events = S.events.filter(e => e.id !== d.id); save('events'); done(); } },
+  newSurg: () => go('surgeryForm', {}),
+  editSurg: d => go('surgeryForm', { id: d.id }),
+  delSurg: d => { if (d.id === 'other') { toast('The general type cannot be deleted.'); return; } if (confirm('Delete this surgery type? Existing patients keep their records.')) { S.surgeries = S.surgeries.filter(s => s.id !== d.id); save('surgeries'); done(); } },
+  export: exportData,
+  import: () => $('#imp').click(),
+  restoreSurg: () => { let n = 0; DEFAULTS.forEach(s => { if (!S.surgeries.some(x => x.id === s.id)) { S.surgeries.push(JSON.parse(JSON.stringify(s))); n++; } }); save('surgeries'); toast(n ? `${n} restored` : 'Nothing to restore'); render(); },
+  updateApp,
+  wipe: () => { if (confirm('Delete ALL patients, events and surgery types from this phone?') && confirm('Are you sure? Export a backup first if unsure.')) { S.patients = []; S.events = []; S.surgeries = JSON.parse(JSON.stringify(DEFAULTS)); ['patients', 'events', 'surgeries'].forEach(save); toast('All data deleted'); render(); } }
+};
+document.addEventListener('click', e => {
+  const i = e.target.closest('.chip input, .opt input');
+  if (i && i.dataset.was === '1') { i.checked = false; i.dataset.was = ''; return; }
+  const el = e.target.closest('[data-act]');
+  if (el && ACT[el.dataset.act]) ACT[el.dataset.act](el.dataset, el);
+});
+document.addEventListener('pointerdown', e => {
+  const l = e.target.closest('.chip, .opt');
+  if (l) { const i = l.querySelector('input'); i.dataset.was = i.checked ? '1' : ''; }
+});
+$('#back').addEventListener('click', () => history.back());
+document.addEventListener('input', e => { if (e.target.id === 'q') { ui.q = e.target.value; $('#plist').innerHTML = plist(); } });
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.name === 'hasDrain') t.form.classList.toggle('nodrain', t.value !== 'Yes');
+  if (t.name === 'date' && t.form && t.form.dataset.form === 'visit') { const p = getP(t.form.dataset.pid); $('#podlbl').textContent = 'POD ' + dayDiff(p.opDate, t.value); }
+  if (t.form && t.form.dataset.form === 'visit' && /^a\d+$/.test(t.name)) { const n = [...t.form.querySelectorAll('input[type=radio]:checked')].filter(i => /^a\d+$/.test(i.name)).length; $('#prog').textContent = `Answered ${n} of ${t.form.dataset.nq}`; }
+  if (t.dataset.set) { S.settings[t.dataset.set] = +t.value; save('settings'); toast('Saved'); }
+  if (t.id === 'imp') importFile(t.files[0]);
+});
+
+const FORMS = {
+  patient(fd, ds) {
+    const s = S.surgeries.find(x => x.id === fd.get('surgId'));
+    const has = fd.get('hasDrain') === 'Yes';
+    const p = ds.id ? getP(ds.id) : { id: uid(), visits: [], status: 'active', dischargeDate: '' };
+    Object.assign(p, { name: fd.get('name').trim(), age: fd.get('age') || '', sex: fd.get('sex') || '', bed: fd.get('bed').trim(), surgId: s.id, surgName: s.name, opDate: fd.get('opDate'), notes: fd.get('notes').trim() });
+    p.drain = { has, type: has ? fd.get('drainType') : '', site: has ? fd.get('drainSite').trim() : '', removedDate: '' };
+    if (!ds.id) S.patients.push(p);
+    recalc(p); save('patients'); toast('Patient saved');
+    if (ds.id) done(); else { view = { name: 'patient', id: p.id }; render(); scrollTo(0, 0); }
+  },
+  visit(fd, ds) {
+    const p = getP(ds.pid), g = k => fd.get(k) || '';
+    const ans = {}, abn = [];
+    GEN_Q.forEach(x => { const a = g(x.name); if (a && x.abn.includes(a)) abn.push(`${x.q}: ${a}`); });
+    if (DRAIN_ABN.includes(g('drainChar'))) abn.push('Drain: ' + g('drainChar'));
+    allQ(p).forEach((x, i) => { const a = fd.get('a' + i); if (a) { ans[x.q] = a; if (x.abn.includes(a)) abn.push(`${x.q}: ${a}`); } });
+    const v = { id: ds.vid || uid(), date: g('date'), temp: g('temp'), pulse: g('pulse'), bp: g('bp').trim(), pain: g('pain'), diet: g('diet'), bowel: g('bowel'), urine: g('urine'), mob: g('mob'), wound: g('wound'), ans, abn, flags: fd.getAll('flags'), drainMl: g('drainMl'), drainChar: g('drainChar'), drainAct: g('drainAct'), plan: g('plan'), note: g('note').trim() };
+    p.visits = p.visits.filter(x => x.id !== v.id).concat(v);
+    recalc(p); save('patients'); toast('Visit saved'); done();
+  },
+  event(fd, ds) {
+    const type = fd.get('type');
+    const base = { type, title: fd.get('title').trim() || type, date: fd.get('date'), start: fd.get('start') || '', end: fd.get('end') || '', place: fd.get('place').trim(), note: fd.get('note').trim() };
+    if (ds.id) Object.assign(S.events.find(e => e.id === ds.id), base);
+    else {
+      const n = fd.get('repeat') === 'weekly' ? Math.min(+fd.get('weeks') || 1, 26) : 1;
+      for (let i = 0; i < n; i++) S.events.push({ ...base, id: uid(), date: ymd(addDays(parse(base.date), 7 * i)) });
+    }
+    S.events.sort(evSort); save('events'); ui.calDate = base.date; toast('Event saved'); done();
+  },
+  surgery(fd, ds) {
+    const base = { name: fd.get('name').trim(), exam: lines(fd.get('exam')).map(parseQ), flags: lines(fd.get('flags')), advice: lines(fd.get('advice')) };
+    if (ds.id) {
+      Object.assign(S.surgeries.find(s => s.id === ds.id), base);
+      S.patients.forEach(p => { if (p.surgId === ds.id) p.surgName = base.name; });
+      save('patients');
+    } else S.surgeries.push({ id: uid(), ...base });
+    save('surgeries'); toast('Surgery type saved'); done();
+  }
+};
+document.addEventListener('submit', e => {
+  const f = e.target;
+  if (f.dataset.form && FORMS[f.dataset.form]) { e.preventDefault(); FORMS[f.dataset.form](new FormData(f), f.dataset); }
+});
+
+/* ---------- start ---------- */
+load().then(render);
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
